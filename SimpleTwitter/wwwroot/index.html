@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+<body>
+
+    <script>
+        var app = angular.module("myTwitter", []);
+        app.controller("myCtrl", function ($scope, $http) {
+            $scope.loadTweets = function () {
+            $http.get("/api/Tweets").then(function (response) {
+                $scope.tweets = response.data;
+                });
+            }
+            $scope.loadTweets();
+            $scope.addTweet = function () {
+                $scope.errortext = "";
+                if (!$scope.addMe) { return; }
+                $http.post("/api/Tweets", { text: $scope.addMe }).then(function () {
+                    $scope.addMe = "";
+                    $scope.loadTweets();
+                });
+
+            }
+            $scope.removeTweet = function (x) {
+                $scope.errortext = "";
+                $http.delete("/api/Tweets/"+x).then(function () {
+                    $scope.loadTweets();
+                });
+            }
+        });
+    </script>
+    <div class="w3-display-container">
+        <div class="w3-display-topmiddle">
+            <div ng-app="myTwitter" ng-cloak ng-controller="myCtrl" class="w3-card-2 w3-margin" style="width:800px;">
+                <header class="w3-container w3-light-grey w3-padding-16">
+                    <h3>My Twitter</h3>
+                </header>
+                <div class="w3-container w3-light-grey w3-padding-16">
+                    <div class="w3-row w3-margin-top">
+                        <div class="w3-col s10">
+                            <input placeholder="Ne düşünüyorsun?" ng-model="addMe" class="w3-input w3-border w3-padding">
+                        </div>
+                        <div class="w3-col s2">
+                            <button ng-click="addTweet()" class="w3-btn w3-padding w3-green">Tweet</button>
+                        </div>
+                    </div>
+                    <p class="w3-text-red">{{errortext}}</p>
+                </div>
+                <ul class="w3-ul">
+                    <li ng-repeat="x in tweets | orderBy:'-date'" class="w3-padding-16">{{x.text}}<span ng-click="removeTweet(x.id)" style="cursor:pointer;" class="w3-right w3-margin-right">×</span></li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
