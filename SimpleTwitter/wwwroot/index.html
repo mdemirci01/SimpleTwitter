@@ -10,9 +10,9 @@
         var app = angular.module("myTwitter", []);
         app.controller("myCtrl", function ($scope, $http) {
             $scope.loadTweets = function () {
-            $http.get("/api/Tweets").then(function (response) {
-                $scope.tweets = response.data;
-                });
+                $http.get("/api/Tweets").then(function (response) {
+                    $scope.tweets = response.data;
+                    });
             }
             $scope.loadTweets();
             $scope.addTweet = function () {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SimpleTwitter.Data;
 using SimpleTwitter.Models;
 
 namespace SimpleTwitter.Controllers
@@ -11,8 +12,8 @@ namespace SimpleTwitter.Controllers
     [ApiController]
     public class TweetsController : ControllerBase
     {
-        private readonly Db db;
-        public TweetsController(Db db)
+        private readonly ApplicationDbContext db;
+        public TweetsController(ApplicationDbContext db)
         {
             this.db = db;
         }
@@ -34,14 +35,18 @@ namespace SimpleTwitter.Controllers
         [HttpPost]
         public void Post([FromBody] Tweet tweet)
         {
-            if (db.Tweets.Count > 0) { 
-                tweet.Id = db.Tweets.Max(t => t.Id) + 1;
-            } else
-            {
-                tweet.Id = 1;
-            }
             tweet.Date = DateTime.Now;
             db.Tweets.Add(tweet);
+            db.SaveChanges();
+        }
+
+        // DELETE api/values/5
+        [HttpDelete("{id}")]
+        public void Delete(int id)
+        {
+            var tweet = db.Tweets.FirstOrDefault(t => t.Id == id);
+            db.Tweets.Remove(tweet);
+            db.SaveChanges();
         }
 
         // PUT api/values/5
@@ -51,14 +56,7 @@ namespace SimpleTwitter.Controllers
             var tw = db.Tweets.FirstOrDefault(t => t.Id == id);
             tw.Text = tweet.Text;
             tw.Date = DateTime.Now;
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-            var tweet = db.Tweets.FirstOrDefault(t => t.Id == id);
-            db.Tweets.Remove(tweet);
+            db.SaveChanges();
         }
     }
 }
